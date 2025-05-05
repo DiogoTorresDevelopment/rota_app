@@ -1,0 +1,88 @@
+# Flutter/Dart padrão
+.dart_tool/
+.packages
+.pub-cache/
+build/
+.idea/
+.vscode/
+*.iml
+
+# Arquivos de configuração de IDE JetBrains (IntelliJ/Android Studio)
+*.ipr
+*.iws
+*.bak
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# Android
+/android/.gradle/
+/android/captures/
+/android/.idea
+/android/local.properties
+/android/app/*.keystore
+/android/key.properties
+
+# iOS
+/ios/.symlinks
+/ios/Pods
+/ios/Flutter/Flutter.framework
+/ios/Flutter/Flutter.podspec
+/ios/Runner.xcworkspace
+/ios/.generated/
+xcuserdata/
+*.xcworkspace
+
+# Web
+/web/.dart_tool/
+/web/build/
+
+# Arquivos de debug/logs
+*.log
+*.tmp
+*.temp
+*.orig
+
+# Arquivos de ambientes
+.env
+.env.*
+.env.dev
+.env.prod
+
+# Gerados pelo Flutter gen-l10n ou build_runner
+l10n.yaml
+generated_plugin_registrant.dart
+**/*.g.dart
+**/*.freezed.dart
+**/*.gr.dart
+
+# Coverage
+coverage/
+
+# Firebase / Crashlytics
+firebase.json
+google-services.json
+GoogleService-Info.plist
+
+# Arquivos de simulação ou mocks
+test/mocks/
+mock_data/
+*.mock.*
+
+# Persistência local
+*.db
+*.sqlite
+*.hive
+*.lock
+
+# Snapshots temporários
+.snapshots/
+
+# flutter_map cache (se usar algum plugin que gere isso)
+*.mapcache
+
+# Outros específicos do seu projeto
+lib/core/config/dev_config.dart
+/teste.idea - Copia/
