@@ -93,20 +93,21 @@ class _HomePageState extends State<HomePage> {
           )
         ],
       ),
-      body: Padding(
+      body: SingleChildScrollView( // ✅ permite scroll vertical
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SectionTitle(title: 'Rotas Ativas'),
             const SizedBox(height: 12),
+
             if (_isLoading)
               const Center(child: CircularProgressIndicator())
             else if (_rotas.isEmpty)
               const Text('Nenhuma rota ativa no momento.')
             else
               SizedBox(
-                height: 160,
+                height: 240, // ✅ compatível com o card que tem height: 220
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: _rotas.length,
@@ -122,28 +123,31 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
               ),
+
             const SizedBox(height: 24),
             const SectionTitle(title: 'Entregas Recentes'),
             const SizedBox(height: 12),
-            _entregasRecentes.isEmpty
-                ? const Text('Nenhuma entrega recente encontrada.')
-                : SizedBox(
-              height: 180,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: _entregasRecentes.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemBuilder: (context, index) {
-                  final entrega = _entregasRecentes[index];
-                  return RotaCardItem(
-                    rota: entrega,
-                    onTap: () {
-                      context.push('/rota_detalhe', extra: entrega);
-                    },
-                  );
-                },
+
+            if (_entregasRecentes.isEmpty)
+              const Text('Nenhuma entrega recente encontrada.')
+            else
+              SizedBox(
+                height: 240, // ✅ mesma altura para prevenir overflow
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _entregasRecentes.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  itemBuilder: (context, index) {
+                    final entrega = _entregasRecentes[index];
+                    return RotaCardItem(
+                      rota: entrega,
+                      onTap: () {
+                        context.push('/rota_detalhe', extra: entrega);
+                      },
+                    );
+                  },
+                ),
               ),
-            ),
           ],
         ),
       ),
