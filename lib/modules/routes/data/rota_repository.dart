@@ -8,4 +8,6 @@ abstract class RotaRepository {
     String? filtroOrigem,
     String? filtroDestino,
   });
+
+  Future<List<RotaModel>> listarEntregasRecentes({int limit = 5});
 }

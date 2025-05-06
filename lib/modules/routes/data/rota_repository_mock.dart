@@ -1,9 +1,9 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
+import 'package:rota_app/core/config/dev_config.dart';
 import 'package:rota_app/modules/routes/domain/models/rota_model.dart';
 import 'package:rota_app/modules/routes/domain/models/ponto_rota.dart';
 import 'rota_repository.dart';
-import 'package:flutter/foundation.dart';
-import 'package:rota_app/core/config/dev_config.dart';
 
 class RotaRepositoryMock implements RotaRepository {
   @override
@@ -65,5 +65,45 @@ class RotaRepositoryMock implements RotaRepository {
     final end = (start + pageSize) > filtradas.length ? filtradas.length : start + pageSize;
 
     return filtradas.sublist(start, end);
+  }
+
+  @override
+  Future<List<RotaModel>> listarEntregasRecentes({int limit = 5}) async {
+    if (DevConfig.simulateDelay) {
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+
+    if (DevConfig.enableLogs) {
+      debugPrint('[Mock] Carregando entregas recentes');
+    }
+
+    final recentes = List.generate(limit, (index) {
+      final id = index + 100;
+      return RotaModel(
+        codigo: 'E${id.toString().padLeft(3, '0')}',
+        origem: 'Origem ${index + 1}',
+        destino: 'Destino ${index + 1}',
+        dataEnvio: '2024-05-${(index + 1).toString().padLeft(2, '0')}',
+        status: 'Concluída',
+        pontos: [
+          PontoRota(
+            nome: 'Origem ${index + 1}',
+            tipo: 'origem',
+            checkinFeito: true,
+            latitude: -19.0 + index * 0.01,
+            longitude: -43.0 + index * 0.01,
+          ),
+          PontoRota(
+            nome: 'Destino ${index + 1}',
+            tipo: 'destino',
+            checkinFeito: true,
+            latitude: -19.5 + index * 0.01,
+            longitude: -43.5 + index * 0.01,
+          ),
+        ],
+      );
+    });
+
+    return recentes;
   }
 }

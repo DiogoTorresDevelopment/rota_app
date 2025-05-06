@@ -5,7 +5,8 @@ import 'package:rota_app/core/config/dev_config.dart';
 import 'package:rota_app/core/helpers/token_helper.dart';
 import 'package:rota_app/modules/routes/domain/models/rota_model.dart';
 import 'package:rota_app/modules/routes/data/rota_repository.dart';
-import 'package:rota_app/modules/routes/data/rota_repository_mock.dart'; // trocar para RotaRepositoryAPI quando estiver com a API real
+import 'package:rota_app/modules/routes/data/rota_repository_mock.dart';
+import 'package:rota_app/core/routes/data/rota_repository_api.dart';
 import 'package:rota_app/modules/routes/widgets/rota_card_item.dart';
 import 'package:rota_app/modules/routes/widgets/section_title.dart';
 
@@ -17,9 +18,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final RotaRepository _repository = RotaRepositoryMock(); // Alternar futuramente para RotaRepositoryAPI
+  final RotaRepository _repository = (DevConfig.isDev || DevConfig.forceMock)
+      ? RotaRepositoryMock()
+      : RotaRepositoryAPI();
+
   String _userName = '...';
   List<RotaModel> _rotas = [];
+  List<RotaModel> _entregasRecentes = [];
   bool _isLoading = true;
 
   @override
@@ -27,6 +32,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _carregarUsuario();
     _carregarRotas();
+    _carregarEntregasRecentes();
   }
 
   Future<void> _carregarUsuario() async {
@@ -52,6 +58,15 @@ class _HomePageState extends State<HomePage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Erro ao carregar rotas')),
       );
+    }
+  }
+
+  Future<void> _carregarEntregasRecentes() async {
+    try {
+      final recentes = await _repository.listarEntregasRecentes(limit: 5);
+      setState(() => _entregasRecentes = recentes);
+    } catch (e) {
+      debugPrint('[HOME] Erro ao carregar entregas recentes: $e');
     }
   }
 
@@ -109,7 +124,26 @@ class _HomePageState extends State<HomePage> {
               ),
             const SizedBox(height: 24),
             const SectionTitle(title: 'Entregas Recentes'),
-            // TODO: Seção de entregas anteriores ou histórico
+            const SizedBox(height: 12),
+            _entregasRecentes.isEmpty
+                ? const Text('Nenhuma entrega recente encontrada.')
+                : SizedBox(
+              height: 160,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: _entregasRecentes.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                itemBuilder: (context, index) {
+                  final entrega = _entregasRecentes[index];
+                  return RotaCardItem(
+                    rota: entrega,
+                    onTap: () {
+                      context.push('/rota_detalhe', extra: entrega);
+                    },
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),

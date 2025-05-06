@@ -21,12 +21,25 @@ class RotaRepositoryAPI implements RotaRepository {
       if (filtroDestino != null) 'destino': filtroDestino,
     });
 
-    // Validação segura da estrutura recebida
     final data = response.data;
     if (data is List) {
       return data.map((json) => RotaModel.fromJson(json)).toList();
     } else {
       throw Exception('Resposta inesperada da API: esperado uma lista de rotas.');
+    }
+  }
+
+  @override
+  Future<List<RotaModel>> listarEntregasRecentes({int limit = 5}) async {
+    final response = await _api.get('/entregas/recentes', queryParameters: {
+      'limit': limit,
+    });
+
+    final data = response.data;
+    if (data is List) {
+      return data.map((json) => RotaModel.fromJson(json)).toList();
+    } else {
+      throw Exception('Resposta inesperada da API: esperado uma lista de entregas recentes.');
     }
   }
 }
