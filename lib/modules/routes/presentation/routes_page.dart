@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:rota_app/core/config/dev_config.dart';
 import 'package:rota_app/modules/routes/domain/models/rota_model.dart';
 import 'package:rota_app/modules/routes/data/rota_repository.dart';

@@ -31,14 +31,13 @@ class _AnexosPageState extends State<AnexosPage> {
   }
 
   Future<void> _carregarAnexosPendentes() async {
-    final pendentes = await AnexoStorageHelper.carregarAnexosPendentes(
-      rotaId: widget.rotaId,
-      ponto: widget.ponto,
-    );
+    final pendentes = await AnexoStorageHelper.carregarAnexosPendentes();
     if (DevConfig.enableLogs) {
-      debugPrint('[MOCK] ${pendentes.length} anexo(s) pendente(s) encontrados para ponto ${widget.ponto}');
+      debugPrint('[MOCK] Carregado ${pendentes.length} anexo(s) pendente(s)');
     }
-    setState(() => _anexos.addAll(pendentes));
+    setState(() {
+      _anexos.addAll(pendentes);
+    });
   }
 
   Future<void> _escolherImagem(ImageSource source) async {
@@ -46,21 +45,20 @@ class _AnexosPageState extends State<AnexosPage> {
     final XFile? imagem = await picker.pickImage(source: source);
 
     if (imagem != null) {
-      final novoAnexo = AnexoModel(
-        arquivo: File(imagem.path),
-        nome: imagem.name,
-        rotaId: widget.rotaId,
-        ponto: widget.ponto,
-      );
-
-      setState(() => _anexos.add(novoAnexo));
+      setState(() {
+        _anexos.add(
+          AnexoModel(
+            arquivo: File(imagem.path),
+            nome: imagem.name,
+            rotaId: widget.rotaId,
+            ponto: widget.ponto,
+          ),
+        );
+      });
 
       if (DevConfig.enableLogs) {
         debugPrint('[MOCK] Anexo adicionado: ${imagem.name}');
       }
-
-      // Salva localmente imediatamente
-      await AnexoStorageHelper.salvarAnexosPendentes(_anexos);
     }
   }
 
@@ -69,7 +67,7 @@ class _AnexosPageState extends State<AnexosPage> {
 
     try {
       if (DevConfig.enableLogs) {
-        debugPrint('[ENVIAR] Tentando enviar ${_anexos.length} anexo(s)...');
+        debugPrint('[MOCK] Tentando enviar ${_anexos.length} anexo(s)...');
       }
 
       if (DevConfig.simulateDelay) {
@@ -82,15 +80,12 @@ class _AnexosPageState extends State<AnexosPage> {
         const SnackBar(content: Text('Anexos enviados com sucesso!')),
       );
 
-      // Limpa somente os anexos deste ponto
-      await AnexoStorageHelper.removerAnexosPorRotaEPonto(
-        rotaId: widget.rotaId,
-        ponto: widget.ponto,
-      );
+      await AnexoStorageHelper.limparAnexosPendentes();
 
       setState(() => _anexos.clear());
 
-      if (mounted) Navigator.pop(context);
+      if (!mounted) return;
+      Navigator.pop(context);
     } catch (e) {
       if (DevConfig.enableLogs) {
         debugPrint('[ERRO] Falha ao enviar anexos: $e');
@@ -107,7 +102,9 @@ class _AnexosPageState extends State<AnexosPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Anexar Documentos')),
+      appBar: AppBar(
+        title: const Text('Anexar Documentos'),
+      ),
       body: Column(
         children: [
           Padding(
@@ -115,7 +112,8 @@ class _AnexosPageState extends State<AnexosPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Rota: ${widget.rotaId}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text('Rota: ${widget.rotaId}',
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
                 Text('Ponto: ${widget.ponto}'),
               ],
             ),
@@ -146,7 +144,8 @@ class _AnexosPageState extends State<AnexosPage> {
               },
             ),
           ),
-          if (_anexos.isNotEmpty)
+          if (_anexos.isNotEmpty) ...[
+            const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.all(16),
               child: ElevatedButton.icon(
@@ -158,6 +157,7 @@ class _AnexosPageState extends State<AnexosPage> {
                 ),
               ),
             ),
+          ],
         ],
       ),
     );
