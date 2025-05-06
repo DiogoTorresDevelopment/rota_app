@@ -94,8 +94,10 @@ class _LoginFormState extends State<LoginForm> {
           ),
           const SizedBox(height: 12),
           TextButton(
-            onPressed: () {},
-            child: const Text('Esqueceu sua senha?'),
+            onPressed: () {
+              context.push('/esqueceu-senha');
+            },
+            child: const Text('Esqueceu a senha?'),
           ),
           const SizedBox(height: 8),
           const Divider(),

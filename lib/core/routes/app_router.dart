@@ -8,6 +8,7 @@ import 'package:rota_app/modules/home/presentation/home_page.dart';
 import 'package:rota_app/modules/navigation/main_scaffold.dart';
 import 'package:rota_app/modules/routes/presentation/routes_page.dart';
 import 'package:rota_app/modules/settings/presentation/settings_page.dart';
+import 'package:rota_app/modules/auth/presentation/forgot_password_page.dart';
 
 // Páginas com argumentos
 import 'package:rota_app/modules/routes/presentation/rota_detalhe_page.dart';
@@ -57,6 +58,11 @@ final GoRouter appRouter = GoRouter(
             final rota = state.extra as RotaModel;
             return RotaDetalhePage(rota: rota);
           },
+        ),
+
+        GoRoute(
+        path: '/esqueceu-senha',
+        builder: (context, state) => const ForgotPasswordPage(),
         ),
       ],
     ),
