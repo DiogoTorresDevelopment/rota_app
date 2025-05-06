@@ -22,7 +22,6 @@ class AuthRepositoryAPI implements AuthRepository {
 
       final result = LoginResponse.fromJson(data);
 
-      // Armazena o token e nome do usuário localmente
       await TokenHelper.saveToken(result.token);
       await TokenHelper.saveUserName(result.user['name']);
 
@@ -35,6 +34,26 @@ class AuthRepositoryAPI implements AuthRepository {
         throw Exception('Credenciais inválidas. Verifique seu e-mail e senha.');
       } else if (statusCode == 422) {
         throw Exception('Dados inválidos. Preencha corretamente.');
+      } else {
+        throw Exception(message);
+      }
+    }
+  }
+
+  @override
+  Future<void> forgotPassword(String email) async {
+    try {
+      await _dioClient.client.post('/forgot-password', data: {
+        'email': email,
+      });
+    } on DioException catch (e) {
+      final statusCode = e.response?.statusCode;
+      final message = e.response?.data['message'] ?? 'Erro desconhecido';
+
+      if (statusCode == 404) {
+        throw Exception('E-mail não encontrado.');
+      } else if (statusCode == 422) {
+        throw Exception('E-mail inválido.');
       } else {
         throw Exception(message);
       }
