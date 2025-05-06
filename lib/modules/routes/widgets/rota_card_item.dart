@@ -20,7 +20,7 @@ class RotaCardItem extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.grey[100], // fundo cinza claro
+          color: Colors.grey[100], // Fundo cinza claro
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -32,6 +32,7 @@ class RotaCardItem extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min, // Evita overflow vertical
           children: [
             // Título
             Row(
@@ -45,73 +46,44 @@ class RotaCardItem extends StatelessWidget {
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                 ),
                 const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
 
-            // Origem
-            Row(
-              children: [
-                const Icon(Icons.location_on_outlined, size: 16, color: Colors.black54),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    'Origem: ${rota.origem}',
-                    style: const TextStyle(fontSize: 14, color: Colors.black87),
-                  ),
-                ),
-              ],
-            ),
-
-            // Destino
+            _buildInfoRow(Icons.location_on_outlined, 'Origem: ${rota.origem}'),
             const SizedBox(height: 4),
-            Row(
-              children: [
-                const Icon(Icons.flag_outlined, size: 16, color: Colors.black54),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    'Destino: ${rota.destino}',
-                    style: const TextStyle(fontSize: 14, color: Colors.black87),
-                  ),
-                ),
-              ],
-            ),
-
-            // Data de envio
+            _buildInfoRow(Icons.flag_outlined, 'Destino: ${rota.destino}'),
             const SizedBox(height: 4),
-            Row(
-              children: [
-                const Icon(Icons.calendar_today, size: 16, color: Colors.black54),
-                const SizedBox(width: 4),
-                Text(
-                  'Data: ${rota.dataEnvio}',
-                  style: const TextStyle(fontSize: 13, color: Colors.black54),
-                ),
-              ],
-            ),
-
-            // Pontos
+            _buildInfoRow(Icons.calendar_today, 'Data: ${rota.dataEnvio}', fontSize: 13, color: Colors.black54),
+            const SizedBox(height: 4),
             if (rota.pontos.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: Row(
-                  children: [
-                    const Icon(Icons.place_rounded, size: 16, color: Colors.black45),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${rota.pontos.length} ponto(s)',
-                      style: const TextStyle(fontSize: 13, color: Colors.black54),
-                    ),
-                  ],
-                ),
-              ),
+              _buildInfoRow(Icons.place_rounded, '${rota.pontos.length} ponto(s)', fontSize: 13, color: Colors.black54),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String text, {double fontSize = 14, Color color = Colors.black87}) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 16, color: color),
+        const SizedBox(width: 4),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(fontSize: fontSize, color: color),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+        ),
+      ],
     );
   }
 }

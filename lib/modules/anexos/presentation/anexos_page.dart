@@ -31,7 +31,10 @@ class _AnexosPageState extends State<AnexosPage> {
   }
 
   Future<void> _carregarAnexosPendentes() async {
-    final pendentes = await AnexoStorageHelper.carregarAnexosPendentes();
+    final pendentes = await AnexoStorageHelper.carregarAnexosPendentes(
+      rotaId: widget.rotaId,
+      ponto: widget.ponto,
+    );
     if (DevConfig.enableLogs) {
       debugPrint('[MOCK] Carregado ${pendentes.length} anexo(s) pendente(s)');
     }
@@ -45,16 +48,18 @@ class _AnexosPageState extends State<AnexosPage> {
     final XFile? imagem = await picker.pickImage(source: source);
 
     if (imagem != null) {
+      final novoAnexo = AnexoModel(
+        arquivo: File(imagem.path),
+        nome: imagem.name,
+        rotaId: widget.rotaId,
+        ponto: widget.ponto,
+      );
+
       setState(() {
-        _anexos.add(
-          AnexoModel(
-            arquivo: File(imagem.path),
-            nome: imagem.name,
-            rotaId: widget.rotaId,
-            ponto: widget.ponto,
-          ),
-        );
+        _anexos.add(novoAnexo);
       });
+
+      await AnexoStorageHelper.salvarAnexosPendentes(_anexos);
 
       if (DevConfig.enableLogs) {
         debugPrint('[MOCK] Anexo adicionado: ${imagem.name}');
