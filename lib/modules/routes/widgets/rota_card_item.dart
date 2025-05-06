@@ -49,42 +49,39 @@ class RotaCardItem extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 8),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.deepPurple.shade200, Colors.deepPurple.shade100],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: Colors.grey.shade200, // 🔁 Fundo cinza claro (substitui gradiente)
           borderRadius: BorderRadius.circular(20),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Colors.white10,
-              blurRadius: 8,
-              offset: Offset(0, 4),
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
+            // Cabeçalho: Status + ícone de seta
             Row(
               children: [
-                Icon(statusIcon, color: statusColor),
-                const SizedBox(width: 8),
-                Text(
-                  rota.status,
-                  style: TextStyle(
-                    color: statusColor,
-                    fontWeight: FontWeight.bold,
+                Icon(statusIcon, color: statusColor, size: 18),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    rota.status,
+                    style: TextStyle(
+                      color: statusColor,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 8),
-                const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+                const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.black45),
               ],
             ),
             const SizedBox(height: 12),
 
-            // Infos
+            // Código da Rota
             Text(
               'Rota ${rota.codigo}',
               style: const TextStyle(
@@ -93,27 +90,35 @@ class RotaCardItem extends StatelessWidget {
                 color: Colors.black87,
               ),
             ),
+
             const SizedBox(height: 4),
+
+            // Origem e destino
             Text(
               '${rota.origem} → ${rota.destino}',
               style: const TextStyle(fontSize: 14, color: Colors.black54),
             ),
-            const SizedBox(height: 6),
+
+            const SizedBox(height: 4),
+
+            // Data de envio
             Text(
               'Data: ${rota.dataEnvio}',
               style: const TextStyle(fontSize: 13, color: Colors.black54),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
 
-            // Rodapé
+            // Rodapé: pontos
             if (rota.pontos.isNotEmpty)
               Row(
                 children: [
                   const Icon(Icons.location_on, size: 16, color: Colors.black45),
                   const SizedBox(width: 4),
-                  Text('${rota.pontos.length} ponto(s)',
-                      style: const TextStyle(fontSize: 13, color: Colors.black54)),
+                  Text(
+                    '${rota.pontos.length} ponto(s)',
+                    style: const TextStyle(fontSize: 13, color: Colors.black54),
+                  ),
                 ],
               ),
           ],

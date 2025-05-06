@@ -128,7 +128,7 @@ class _HomePageState extends State<HomePage> {
             _entregasRecentes.isEmpty
                 ? const Text('Nenhuma entrega recente encontrada.')
                 : SizedBox(
-              height: 160,
+              height: 180,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: _entregasRecentes.length,
