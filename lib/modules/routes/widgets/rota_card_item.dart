@@ -15,66 +15,64 @@ class RotaCardItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 140), // Garante altura mínima
-        child: Container(
-          width: 240,
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.grey[100], // Fundo cinza claro
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.shade300,
-                blurRadius: 6,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min, // Impede overflow vertical
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Cabeçalho
-              Row(
-                children: [
-                  const Icon(Icons.local_shipping, size: 20, color: Colors.deepPurple),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Rota ${rota.codigo}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
+      child: Container(
+        width: 240,
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.shade300,
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Cabeçalho
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Icon(Icons.local_shipping, size: 20, color: Colors.deepPurple),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Rota ${rota.codigo}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
-                  const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              // Informações
-              _buildInfoRow(Icons.location_on_outlined, 'Origem: ${rota.origem}'),
-              const SizedBox(height: 4),
-              _buildInfoRow(Icons.flag_outlined, 'Destino: ${rota.destino}'),
-              const SizedBox(height: 4),
-              _buildInfoRow(Icons.calendar_today, 'Data: ${rota.dataEnvio}', fontSize: 13, color: Colors.black54),
-              const SizedBox(height: 4),
-
-              // Pontos (se houver)
-              if (rota.pontos.isNotEmpty)
-                _buildInfoRow(
-                  Icons.place_rounded,
-                  '${rota.pontos.length} ponto(s)',
-                  fontSize: 13,
-                  color: Colors.black54,
                 ),
-            ],
-          ),
+                const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              ],
+            ),
+            const SizedBox(height: 8),
+
+            // Informações
+            _buildInfoRow(Icons.location_on_outlined, 'Origem: ${rota.origem}'),
+            const SizedBox(height: 4),
+            _buildInfoRow(Icons.flag_outlined, 'Destino: ${rota.destino}'),
+            const SizedBox(height: 4),
+            _buildInfoRow(Icons.calendar_today, 'Data: ${rota.dataEnvio}', fontSize: 13, color: Colors.black54),
+            const SizedBox(height: 4),
+
+            // Pontos
+            if (rota.pontos.isNotEmpty)
+              _buildInfoRow(
+                Icons.place_rounded,
+                '${rota.pontos.length} ponto(s)',
+                fontSize: 13,
+                color: Colors.black54,
+              ),
+          ],
         ),
       ),
     );
