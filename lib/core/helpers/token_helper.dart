@@ -43,6 +43,12 @@ class TokenHelper {
     return null;
   }
 
+  // Limpa os dados do usuário
+  static Future<void> clearUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_userKey);
+  }
+
   // Salva os dados do motorista
   static Future<void> saveDriverData(DriverModel driver) async {
     final prefs = await SharedPreferences.getInstance();

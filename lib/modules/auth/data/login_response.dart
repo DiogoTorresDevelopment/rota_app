@@ -34,4 +34,7 @@ class LoginResponse {
   String get driverName => driver['name'] ?? '';
   String get driverPhone => driver['phone'] ?? '';
   int get driverId => driver['id'] ?? 0;
+  String get userEmail => user['email'] ?? '';
+  int get userId => user['id'] ?? 0;
+  String get userType => user['type'] ?? '';
 }

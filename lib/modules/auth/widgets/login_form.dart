@@ -93,20 +93,20 @@ class _LoginFormState extends State<LoginForm> {
             child: const Text('Confirmar'),
           ),
           const SizedBox(height: 12),
-          TextButton(
-            onPressed: () {
-              context.push('/esqueceu-senha');
-            },
-            child: const Text('Esqueceu a senha?'),
-          ),
+          // TextButton(
+          //   onPressed: () {
+          //     context.push('/esqueceu-senha');
+          //   },
+          //   child: const Text('Esqueceu a senha?'),
+          // ),
           const SizedBox(height: 8),
           const Divider(),
-          const SizedBox(height: 8),
-          OutlinedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.g_mobiledata),
-            label: const Text('Continuar com Google'),
-          ),
+          // const SizedBox(height: 8),
+          // OutlinedButton.icon(
+          //   onPressed: () {},
+          //   icon: const Icon(Icons.g_mobiledata),
+          //   label: const Text('Continuar com Google'),
+          // ),
         ],
       ),
     );

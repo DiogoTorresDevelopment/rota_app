@@ -41,21 +41,22 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _logout() async {
+    if (_isLoading) return;
+    
     setState(() => _isLoading = true);
 
     try {
       await _repository.logout();
-      if (!mounted) return;
-      context.go('/login');
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao sair: ${e.toString()}')),
-      );
+      debugPrint('❌ Erro durante logout: $e');
+      // Mesmo com erro, garante que os dados foram limpos
+      await TokenHelper.clearToken();
+      await TokenHelper.clearUserData();
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (!mounted) return;
+      
+      // Em qualquer caso, redireciona para o login
+      context.go('/login');
     }
   }
 

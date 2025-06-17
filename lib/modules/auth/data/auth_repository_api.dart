@@ -33,16 +33,21 @@ class AuthRepositoryAPI implements AuthRepository {
           throw Exception('Sua conta está desativada. Entre em contato com o suporte.');
         }
 
+        // Salva o token
         await TokenHelper.saveToken(result.token);
-        await TokenHelper.saveUserName(result.driverName);
+        
+        // Salva os dados do usuário
         await TokenHelper.saveUserData({
+          'id': result.userId,
           'name': result.driverName,
-          'email': result.user['email'],
+          'email': result.userEmail,
           'phone': result.driverPhone,
-          'id': result.driverId,
+          'type': result.userType,
+          'driver_id': result.driverId,
         });
+
         debugPrint('✅ Login realizado com sucesso');
-        debugPrint('👤 Dados do usuário: ${result.driverName} (${result.user['email']})');
+        debugPrint('👤 Dados do usuário: ${result.driverName} (${result.userEmail})');
 
         return result;
       } else {
@@ -75,6 +80,49 @@ class AuthRepositoryAPI implements AuthRepository {
     } catch (e) {
       debugPrint('❌ Erro inesperado: $e');
       throw Exception('Erro inesperado ao fazer login. Tente novamente.');
+    }
+  }
+
+  @override
+  Future<void> logout() async {
+    try {
+      debugPrint('🔑 Realizando logout...');
+      
+      // Primeiro limpa o token local para garantir que não ficará token inválido
+      await TokenHelper.clearToken();
+      await TokenHelper.clearUserData();
+      
+      // Tenta fazer o logout na API
+      try {
+        final response = await _apiService.post(ApiConfig.logout);
+        final data = response.data;
+        
+        if (data['success'] == true) {
+          debugPrint('✅ Logout realizado com sucesso na API');
+          debugPrint('📝 Mensagem: ${data['message']}');
+        } else {
+          debugPrint('⚠️ API retornou erro no logout, mas token local foi limpo');
+          debugPrint('📝 Mensagem: ${data['message']}');
+        }
+      } on DioException catch (e) {
+        debugPrint('⚠️ Erro na API durante logout: ${e.response?.statusCode}');
+        debugPrint('📝 Mensagem: ${e.response?.data['message']}');
+        
+        // Se for erro de autenticação (401) ou token expirado, apenas loga
+        if (e.response?.statusCode == 401) {
+          debugPrint('⚠️ Token expirado ou inválido');
+        }
+        // Para outros erros, apenas loga mas não falha
+        // O importante é que os dados locais foram limpos
+      }
+      
+      debugPrint('✅ Logout finalizado');
+    } catch (e) {
+      debugPrint('❌ Erro inesperado: $e');
+      // Mesmo com erro, garante que os dados locais foram limpos
+      await TokenHelper.clearToken();
+      await TokenHelper.clearUserData();
+      throw Exception('Erro inesperado ao realizar logout');
     }
   }
 
@@ -120,41 +168,6 @@ class AuthRepositoryAPI implements AuthRepository {
     } catch (e) {
       debugPrint('❌ Erro inesperado: $e');
       throw Exception('Erro inesperado ao solicitar recuperação. Tente novamente.');
-    }
-  }
-
-  @override
-  Future<void> logout() async {
-    try {
-      debugPrint('🔑 Realizando logout...');
-      
-      // Primeiro limpa o token local para garantir que não ficará token inválido
-      await TokenHelper.clearToken();
-      
-      // Tenta fazer o logout na API, mas não falha se der erro
-      try {
-        final response = await _apiService.post(ApiConfig.logout);
-        final data = response.data;
-        
-        if (data['success'] == true) {
-          debugPrint('✅ Logout realizado com sucesso na API');
-        } else {
-          debugPrint('⚠️ API retornou erro no logout, mas token local foi limpo');
-        }
-      } on DioException catch (e) {
-        // Se der erro 429 (rate limit) ou 401 (token inválido), apenas loga
-        if (e.response?.statusCode == 429 || e.response?.statusCode == 401) {
-          debugPrint('⚠️ Erro na API durante logout: ${e.response?.statusCode}');
-        } else {
-          // Para outros erros, relança a exceção
-          rethrow;
-        }
-      }
-      
-      debugPrint('✅ Logout finalizado');
-    } catch (e) {
-      debugPrint('❌ Erro inesperado: $e');
-      throw Exception('Erro inesperado ao realizar logout');
     }
   }
 }

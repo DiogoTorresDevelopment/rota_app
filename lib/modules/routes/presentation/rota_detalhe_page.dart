@@ -21,7 +21,7 @@ class _RotaDetalhePageState extends State<RotaDetalhePage> {
   @override
   void initState() {
     super.initState();
-    pontos = List.from(widget.rota.pontos); // Clona localmente
+    // pontos = List.from(widget.rota.pontos); // Clona localmente
   }
 
   void _fazerCheckIn(int index) {
