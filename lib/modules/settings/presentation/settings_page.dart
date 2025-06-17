@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:rota_app/core/helpers/token_helper.dart';
+import 'package:rota_app/core/config/dev_config.dart';
 import 'package:rota_app/modules/auth/data/auth_repository.dart';
 import 'package:rota_app/modules/auth/data/auth_repository_api.dart';
 import 'package:rota_app/modules/auth/data/auth_repository_mock.dart';
-import 'package:rota_app/core/config/dev_config.dart';
+import 'package:rota_app/modules/auth/data/user_profile.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -18,24 +18,32 @@ class _SettingsPageState extends State<SettingsPage> {
       ? AuthRepositoryMock()
       : AuthRepositoryAPI();
   
-  String? _userName;
-  String? _userEmail;
-  String? _userPhone;
+  UserProfile? _userProfile;
   bool _isLoading = false;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _loadUserProfile();
   }
 
-  Future<void> _loadUserData() async {
-    final userData = await TokenHelper.getUserData();
-    if (userData != null) {
+  Future<void> _loadUserProfile() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final profile = await _repository.getProfile();
       setState(() {
-        _userName = userData['name'];
-        _userEmail = userData['email'];
-        _userPhone = userData['phone'];
+        _userProfile = profile;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
       });
     }
   }
@@ -43,19 +51,22 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _logout() async {
     if (_isLoading) return;
     
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
 
     try {
       await _repository.logout();
-    } catch (e) {
-      debugPrint('❌ Erro durante logout: $e');
-      // Mesmo com erro, garante que os dados foram limpos
-      await TokenHelper.clearToken();
-      await TokenHelper.clearUserData();
-    } finally {
       if (!mounted) return;
-      
-      // Em qualquer caso, redireciona para o login
+      context.go('/login');
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+      // Mesmo com erro, redireciona para o login
+      if (!mounted) return;
       context.go('/login');
     }
   }
@@ -76,32 +87,60 @@ class _SettingsPageState extends State<SettingsPage> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    ListTile(
-                      leading: const Icon(Icons.person),
-                      title: const Text('Nome'),
-                      subtitle: Text(_userName ?? 'Carregando...'),
-                    ),
-                    const Divider(),
-                    ListTile(
-                      leading: const Icon(Icons.email),
-                      title: const Text('E-mail'),
-                      subtitle: Text(_userEmail ?? ''),
-                    ),
-                    const Divider(),
-                    ListTile(
-                      leading: const Icon(Icons.phone),
-                      title: const Text('Telefone'),
-                      subtitle: Text(_userPhone ?? ''),
-                    ),
-                  ],
+            if (_isLoading)
+              const Center(child: CircularProgressIndicator())
+            else if (_error != null)
+              Card(
+                color: Colors.red.shade50,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Erro ao carregar dados',
+                        style: TextStyle(color: Colors.red.shade900),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _error!,
+                        style: TextStyle(color: Colors.red.shade700),
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: _loadUserProfile,
+                        child: const Text('Tentar novamente'),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else if (_userProfile != null)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.person),
+                        title: const Text('Nome'),
+                        subtitle: Text(_userProfile!.name),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        leading: const Icon(Icons.email),
+                        title: const Text('E-mail'),
+                        subtitle: Text(_userProfile!.email),
+                      ),
+                      const Divider(),
+                      ListTile(
+                        leading: const Icon(Icons.phone),
+                        title: const Text('Telefone'),
+                        subtitle: Text(_userProfile!.driver.phone),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
             const SizedBox(height: 24),
             const Text(
               'Sistema',

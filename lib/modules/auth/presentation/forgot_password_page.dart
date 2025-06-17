@@ -31,19 +31,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
     setState(() => _isLoading = true);
 
-    try {
-      await _repository.forgotPassword(email);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('📧 Instruções enviadas para seu e-mail!')),
-      );
-      Navigator.pop(context);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro: ${e.toString()}')),
-      );
-    } finally {
-      setState(() => _isLoading = false);
-    }
+    // try {
+    //   await _repository.forgotPassword(email);
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('📧 Instruções enviadas para seu e-mail!')),
+    //   );
+    //   Navigator.pop(context);
+    // } catch (e) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(content: Text('Erro: ${e.toString()}')),
+    //   );
+    // } finally {
+    //   setState(() => _isLoading = false);
+    // }
   }
 
   @override

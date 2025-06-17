@@ -18,12 +18,12 @@ class DevConfig {
   /// Acesso à API definida no .env
   static String get apiBaseUrl {
     try {
-      final url = dotenv.env['API_URL'] ?? 'http://rota.test/api';
+      final url = dotenv.env['API_URL'] ?? 'http://rota.test';
       debugPrint('🌐 API Base URL: $url');
       return url;
     } catch (e) {
       debugPrint('⚠️ Erro ao carregar API_URL do .env, usando URL padrão');
-      return 'http://rota.test/api';
+      return 'http://rota.test';
     }
   }
 

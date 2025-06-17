@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:rota_app/modules/auth/data/auth_repository.dart';
 import 'package:rota_app/modules/auth/data/login_response.dart';
 import 'package:rota_app/core/helpers/token_helper.dart';
+import 'package:rota_app/modules/auth/data/user_profile.dart';
 
 class AuthRepositoryMock implements AuthRepository {
   @override
@@ -10,51 +11,59 @@ class AuthRepositoryMock implements AuthRepository {
     required String email,
     required String password,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 800));
+    // Simula um delay de rede
+    await Future.delayed(const Duration(seconds: 1));
 
-    if (email == 'teste@rota.com' && password == '123456') {
-      const tokenFalso = 'mocked-token-123456';
+    // Simula credenciais inválidas
+    if (email != 'motorista1@gmail.com' || password != 'root3001') {
+      throw Exception('Credenciais inválidas');
+    }
 
-      await TokenHelper.saveToken(tokenFalso);
-      await TokenHelper.saveUserName('Motorista Teste');
-
-      return LoginResponse(
-        token: tokenFalso,
-        user: {
+    return LoginResponse(
+      token: 'mock_token',
+      user: {
+        'id': 1,
+        'name': 'Motorista 1',
+        'email': 'motorista1@gmail.com',
+        'type': 'driver',
+        'driver': {
           'id': 1,
-          'name': 'Motorista Teste',
-          'email': email,
-          'type': 'driver',
-        },
-        driver: {
-          'id': 1,
-          'name': 'Motorista Teste',
-          'email': email,
-          'phone': '(11) 99999-9999',
+          'name': 'Motorista 1',
+          'phone': '(46) 99292-9292',
           'status': true,
         },
-      );
-    } else {
-      throw Exception('Usuário ou senha inválidos (modo mock)');
-    }
+      },
+      driver: {
+        'id': 1,
+        'name': 'Motorista 1',
+        'phone': '(46) 99292-9292',
+        'status': true,
+      },
+    );
   }
 
   @override
-  Future<void> forgotPassword(String email) async {
+  Future<UserProfile> getProfile() async {
+    // Simula um delay de rede
     await Future.delayed(const Duration(seconds: 1));
-    debugPrint('[Mock] Simulando envio de recuperação para $email');
 
-    if (!email.contains('@')) {
-      throw Exception('E-mail inválido (simulado)');
-    }
-
-    // Aqui você poderia simular o sucesso ou falha condicionalmente também
+    return UserProfile(
+      id: 1,
+      name: 'Motorista 1',
+      email: 'motorista1@gmail.com',
+      type: 'driver',
+      driver: DriverProfile(
+        id: 1,
+        name: 'Motorista 1',
+        phone: '(46) 99292-9292',
+        status: true,
+      ),
+    );
   }
 
   @override
   Future<void> logout() async {
-    await Future.delayed(const Duration(milliseconds: 800));
-    debugPrint('[Mock] Simulando logout');
-    await TokenHelper.clearToken();
+    // Simula um delay de rede
+    await Future.delayed(const Duration(seconds: 1));
   }
 }
