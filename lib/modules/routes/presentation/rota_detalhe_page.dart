@@ -43,6 +43,7 @@ class _RotaDetalhePageState extends State<RotaDetalhePage> {
   }
 
   void _mostrarConfirmacaoEntrega() {
+    final parentContext = context; // Salva o contexto da tela principal
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -54,11 +55,26 @@ class _RotaDetalhePageState extends State<RotaDetalhePage> {
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('🚚 Entrega concluída!')),
-              );
+              try {
+                final repo = RotaRepositoryAPI();
+                final updatedDelivery = await repo.concluirEntrega(widget.delivery.id);
+                setState(() {
+                  pontos = List.from(updatedDelivery.stops);
+                });
+                ScaffoldMessenger.of(parentContext).showSnackBar(
+                  const SnackBar(content: Text('🚚 Entrega concluída!')),
+                );
+                // Redireciona para a tela de listagem de rotas
+                if (mounted) {
+                  Navigator.of(parentContext).pushNamedAndRemoveUntil('/rotas', (route) => false);
+                }
+              } catch (e) {
+                ScaffoldMessenger.of(parentContext).showSnackBar(
+                  SnackBar(content: Text('Erro ao concluir entrega: $e')),
+                );
+              }
             },
             child: const Text('Confirmar'),
           ),
@@ -166,12 +182,13 @@ class _RotaDetalhePageState extends State<RotaDetalhePage> {
               ),
             ),
             const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: _mostrarConfirmacaoEntrega,
-              icon: const Icon(Icons.flag_outlined),
-              label: const Text('Concluir Entrega'),
-              style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
-            ),
+            if (delivery.status != 'completed')
+              ElevatedButton.icon(
+                onPressed: _mostrarConfirmacaoEntrega,
+                icon: const Icon(Icons.flag_outlined),
+                label: const Text('Concluir Entrega'),
+                style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+              ),
           ],
         ),
       ),
