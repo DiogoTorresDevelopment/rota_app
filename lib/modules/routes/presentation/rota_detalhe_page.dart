@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:rota_app/modules/routes/domain/models/delivery_model.dart';
 import 'package:rota_app/modules/routes/presentation/widgets/rota_ponto_tile.dart';
 import 'package:rota_app/modules/anexos/presentation/anexos_page.dart';
+import 'package:rota_app/core/routes/data/rota_repository_api.dart';
 
 class RotaDetalhePage extends StatefulWidget {
   final DeliveryModel delivery;
@@ -23,26 +24,22 @@ class _RotaDetalhePageState extends State<RotaDetalhePage> {
     pontos = List.from(widget.delivery.stops); // Clona localmente
   }
 
-  void _fazerCheckIn(int index) {
-    if (pontos[index].status == 'completed') return;
-
-    setState(() {
-      pontos[index] = StopModel(
-        id: pontos[index].id,
-        name: pontos[index].name,
-        order: pontos[index].order,
-        status: 'completed',
-        completedAt: DateTime.now(),
-        photos: pontos[index].photos,
-        latitude: pontos[index].latitude,
-        longitude: pontos[index].longitude,
-        address: pontos[index].address,
+  void _fazerCheckIn(int index) async {
+    final stop = pontos[index];
+    try {
+      final repo = RotaRepositoryAPI();
+      final updatedDelivery = await repo.concluirParada(widget.delivery.id, stop.id);
+      setState(() {
+        pontos = List.from(updatedDelivery.stops);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('✅ Check-in feito em: ${stop.name}')),
       );
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('✅ Check-in feito em: ${pontos[index].name}')),
-    );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao concluir parada: $e')),
+      );
+    }
   }
 
   void _mostrarConfirmacaoEntrega() {

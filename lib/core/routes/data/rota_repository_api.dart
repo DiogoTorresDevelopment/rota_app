@@ -95,4 +95,29 @@ class RotaRepositoryAPI implements RotaRepository {
       throw Exception('Erro ao buscar delivery: ${response.body}');
     }
   }
+
+  Future<DeliveryModel> concluirParada(int deliveryId, int stopId) async {
+    final token = await TokenHelper.getToken();
+    if (token == null) throw Exception('Token não encontrado');
+    final baseUrl = DevConfig.apiBaseUrl;
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/driver/deliveries/$deliveryId/complete-stop'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Accept': 'application/json',
+      },
+      // Se precisar enviar o stopId no body, descomente abaixo:
+      // body: jsonEncode({'stop_id': stopId}),
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['success'] == true && data['data'] != null && data['data']['delivery'] != null) {
+        return DeliveryModel.fromJson(data['data']['delivery']);
+      } else {
+        throw Exception('Formato de resposta inválido da API');
+      }
+    } else {
+      throw Exception('Erro ao concluir parada: ${response.body}');
+    }
+  }
 }
