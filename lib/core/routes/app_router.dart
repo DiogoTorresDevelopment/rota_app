@@ -12,6 +12,7 @@ import 'package:rota_app/modules/auth/presentation/forgot_password_page.dart';
 // Páginas com argumentos
 import 'package:rota_app/modules/routes/presentation/rota_detalhe_page.dart';
 import 'package:rota_app/modules/routes/domain/models/rota_model.dart';
+import 'package:rota_app/modules/routes/domain/models/delivery_model.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/splash',
@@ -54,8 +55,8 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/rota_detalhe',
           builder: (context, state) {
-            final rota = state.extra as RotaModel;
-            return RotaDetalhePage(rota: rota);
+            final delivery = state.extra as DeliveryModel;
+            return RotaDetalhePage(delivery: delivery);
           },
         ),
 

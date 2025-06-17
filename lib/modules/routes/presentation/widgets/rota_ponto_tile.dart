@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:rota_app/modules/routes/domain/models/ponto_rota.dart';
+import 'package:rota_app/modules/routes/domain/models/delivery_model.dart';
 
 class RotaPontoTile extends StatelessWidget {
-  final PontoRota ponto;
+  final StopModel ponto;
   final VoidCallback onCheckIn;
   final VoidCallback onAnexar;
 
@@ -15,15 +15,16 @@ class RotaPontoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cor = ponto.checkinFeito ? Colors.green : Colors.orange;
-    final icone = ponto.checkinFeito ? Icons.check_circle : Icons.radio_button_unchecked;
+    final checkinFeito = ponto.status == 'completed';
+    final cor = checkinFeito ? Colors.green : Colors.orange;
+    final icone = checkinFeito ? Icons.check_circle : Icons.radio_button_unchecked;
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: ListTile(
         leading: Icon(icone, color: cor),
-        title: Text('${ponto.tipo.toUpperCase()} - ${ponto.nome}'),
-        subtitle: Text(ponto.checkinFeito ? 'Check-in realizado' : 'Aguardando check-in'),
+        title: Text(ponto.name),
+        subtitle: Text(checkinFeito ? 'Check-in realizado' : 'Aguardando check-in'),
         trailing: Wrap(
           spacing: 12,
           children: [

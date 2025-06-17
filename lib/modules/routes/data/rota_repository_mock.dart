@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:rota_app/core/config/dev_config.dart';
 import 'package:rota_app/modules/routes/domain/models/rota_model.dart';
 import 'package:rota_app/modules/routes/domain/models/ponto_rota.dart';
+import 'package:rota_app/modules/routes/domain/models/delivery_model.dart';
 import 'rota_repository.dart';
 
 class RotaRepositoryMock implements RotaRepository {
@@ -105,5 +106,122 @@ class RotaRepositoryMock implements RotaRepository {
     });
 
     return recentes;
+  }
+
+  @override
+  Future<List<DeliveryModel>> listarDeliveries() async {
+    if (DevConfig.simulateDelay) {
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+
+    if (DevConfig.enableLogs) {
+      debugPrint('[Mock] Carregando deliveries');
+    }
+
+    return [
+      DeliveryModel(
+        id: 1,
+        status: 'in_progress',
+        createdAt: DateTime.now(),
+        completedAt: null,
+        notes: null,
+        route: RouteModel(
+          id: 1,
+          name: 'Rota 1',
+          status: 'active',
+        ),
+        driver: DriverModel(
+          id: 1,
+          name: 'Motorista 1',
+          phone: '(46) 99292-9292',
+          email: 'motorista1@gmail.com',
+        ),
+        truck: TruckModel(
+          id: 1,
+          plate: 'ASD2S23',
+          model: 'FHN-8008',
+          brand: 'Volvo FH',
+          year: 2025,
+          color: 'Vermelho',
+          fuelType: 'Gasolina',
+          loadCapacity: '400000.00',
+          chassis: 'ASDK19281984ASD',
+          mileage: '15000.00',
+          lastReview: '2025-06-07T00:00:00.000000Z',
+          status: true,
+        ),
+        currentStop: StopModel(
+          id: 1,
+          name: 'Destino1',
+          order: 1,
+          status: 'pending',
+          completedAt: null,
+          photos: [],
+          latitude: '-25.0774645',
+          longitude: '-50.2064726',
+          address: AddressModel(
+            street: 'Avenida Souza Naves',
+            number: '2420',
+            city: 'Ponta Grossa',
+            state: 'PR',
+            cep: '84062-000',
+          ),
+        ),
+        stops: [
+          StopModel(
+            id: 1,
+            name: 'Destino1',
+            order: 1,
+            status: 'pending',
+            completedAt: null,
+            photos: [],
+            latitude: '-25.0774645',
+            longitude: '-50.2064726',
+            address: AddressModel(
+              street: 'Avenida Souza Naves',
+              number: '2420',
+              city: 'Ponta Grossa',
+              state: 'PR',
+              cep: '84062-000',
+            ),
+          ),
+          StopModel(
+            id: 2,
+            name: 'Destino 2',
+            order: 2,
+            status: 'pending',
+            completedAt: null,
+            photos: [],
+            latitude: '-25.3622156',
+            longitude: '-51.4804577',
+            address: AddressModel(
+              street: 'Rua Industrial',
+              number: '400',
+              city: 'Guarapuava',
+              state: 'PR',
+              cep: '85045-390',
+            ),
+          ),
+        ],
+      ),
+    ];
+  }
+
+  @override
+  Future<DeliveryModel> buscarDeliveryPorId(int id) async {
+    if (DevConfig.simulateDelay) {
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+
+    if (DevConfig.enableLogs) {
+      debugPrint('[Mock] Buscando delivery com ID: $id');
+    }
+
+    // Retorna o primeiro delivery da lista mock como exemplo
+    final deliveries = await listarDeliveries();
+    if (deliveries.isEmpty) {
+      throw Exception('Nenhum delivery encontrado');
+    }
+    return deliveries.first;
   }
 }

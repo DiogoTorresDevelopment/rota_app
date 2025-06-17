@@ -3,7 +3,7 @@ import 'package:rota_app/core/config/dev_config.dart';
 import 'package:rota_app/modules/routes/domain/models/rota_model.dart';
 import 'package:rota_app/modules/routes/data/rota_repository.dart';
 import 'package:rota_app/core/routes/data/rota_repository_api.dart';
-import 'package:rota_app/modules/routes/data/rota_repository_mock.dart';
+// import 'package:rota_app/modules/routes/data/rota_repository_mock.dart';
 import 'package:rota_app/modules/routes/widgets/filter_bottom_sheet.dart';
 import 'package:rota_app/modules/routes/widgets/rota_list_tile.dart';
 
@@ -15,9 +15,10 @@ class RoutesPage extends StatefulWidget {
 }
 
 class _RoutesPageState extends State<RoutesPage> {
-  final RotaRepository _repository = (DevConfig.isDev || DevConfig.forceMock)
-      ? RotaRepositoryMock()
-      : RotaRepositoryAPI();
+  // final RotaRepository _repository = (DevConfig.isDev || DevConfig.forceMock)
+  //     ? RotaRepositoryMock()
+  //     : RotaRepositoryAPI();
+  final RotaRepository _repository = RotaRepositoryAPI();
 
   final List<RotaModel> _allRotas = [];
   final ScrollController _scrollController = ScrollController();

@@ -3,12 +3,13 @@ import 'package:go_router/go_router.dart';
 
 import 'package:rota_app/core/config/dev_config.dart';
 import 'package:rota_app/core/helpers/token_helper.dart';
-import 'package:rota_app/modules/routes/domain/models/rota_model.dart';
+import 'package:rota_app/modules/routes/domain/models/delivery_model.dart';
 import 'package:rota_app/modules/routes/data/rota_repository.dart';
-import 'package:rota_app/modules/routes/data/rota_repository_mock.dart';
+// import 'package:rota_app/modules/routes/data/rota_repository_mock.dart';
 import 'package:rota_app/core/routes/data/rota_repository_api.dart';
 import 'package:rota_app/modules/routes/widgets/rota_card_item.dart';
 import 'package:rota_app/modules/routes/widgets/section_title.dart';
+import 'package:rota_app/modules/routes/widgets/delivery_card_item.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,25 +19,24 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final RotaRepository _repository = (DevConfig.isDev || DevConfig.forceMock)
-      ? RotaRepositoryMock()
-      : RotaRepositoryAPI();
+  // final RotaRepository _repository = (DevConfig.isDev || DevConfig.forceMock)
+  //     ? RotaRepositoryMock()
+  //     : RotaRepositoryAPI();
+  final RotaRepository _repository = RotaRepositoryAPI();
 
   String _userName = '...';
-  List<RotaModel> _rotas = [];
-  List<RotaModel> _entregasRecentes = [];
+  List<DeliveryModel> _deliveries = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _carregarUsuario();
-    _carregarRotas();
-    _carregarEntregasRecentes();
+    _carregarDeliveries();
   }
 
   Future<void> _carregarUsuario() async {
-    final nome = await TokenHelper.getUserName();
+    final nome = await TokenHelper.getUserNameFromToken();
     if (DevConfig.enableLogs) {
       debugPrint('[HOME] Nome do usuário carregado: $nome');
     }
@@ -45,28 +45,19 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _carregarRotas() async {
+  Future<void> _carregarDeliveries() async {
     try {
-      final resultado = await _repository.listarRotas();
+      final resultado = await _repository.listarDeliveries();
       setState(() {
-        _rotas = resultado;
+        _deliveries = resultado;
         _isLoading = false;
       });
     } catch (e) {
       setState(() => _isLoading = false);
-      debugPrint('[HOME] Erro ao carregar rotas: $e');
+      debugPrint('[HOME] Erro ao carregar deliveries: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao carregar rotas')),
+        const SnackBar(content: Text('Erro ao carregar entregas')),
       );
-    }
-  }
-
-  Future<void> _carregarEntregasRecentes() async {
-    try {
-      final recentes = await _repository.listarEntregasRecentes(limit: 5);
-      setState(() => _entregasRecentes = recentes);
-    } catch (e) {
-      debugPrint('[HOME] Erro ao carregar entregas recentes: $e');
     }
   }
 
@@ -81,6 +72,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final inProgressDeliveries = _deliveries.where((d) => d.status == 'in_progress').toList();
+    final completedDeliveries = _deliveries.where((d) => d.status == 'completed').toList();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Olá, $_userName 👋'),
@@ -93,61 +87,62 @@ class _HomePageState extends State<HomePage> {
           )
         ],
       ),
-      body: SingleChildScrollView( // ✅ permite scroll vertical
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SectionTitle(title: 'Rotas Ativas'),
-            const SizedBox(height: 12),
-
             if (_isLoading)
               const Center(child: CircularProgressIndicator())
-            else if (_rotas.isEmpty)
-              const Text('Nenhuma rota ativa no momento.')
-            else
-              SizedBox(
-                height: 240, // ✅ compatível com o card que tem height: 220
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _rotas.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 12),
-                  itemBuilder: (context, index) {
-                    final rota = _rotas[index];
-                    return RotaCardItem(
-                      rota: rota,
-                      onTap: () {
-                        context.push('/rota_detalhe', extra: rota);
-                      },
-                    );
-                  },
+            else ...[
+              if (inProgressDeliveries.isNotEmpty) ...[
+                const SectionTitle(title: 'Entregas em Andamento'),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 240,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: inProgressDeliveries.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 12),
+                    itemBuilder: (context, index) {
+                      final delivery = inProgressDeliveries[index];
+                      return DeliveryCardItem(
+                        delivery: delivery,
+                        onTap: () {
+                          context.push('/rota_detalhe', extra: delivery);
+                        },
+                      );
+                    },
+                  ),
                 ),
-              ),
+                const SizedBox(height: 24),
+              ],
 
-            const SizedBox(height: 24),
-            const SectionTitle(title: 'Entregas Recentes'),
-            const SizedBox(height: 12),
-
-            if (_entregasRecentes.isEmpty)
-              const Text('Nenhuma entrega recente encontrada.')
-            else
-              SizedBox(
-                height: 240, // ✅ mesma altura para prevenir overflow
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _entregasRecentes.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 12),
-                  itemBuilder: (context, index) {
-                    final entrega = _entregasRecentes[index];
-                    return RotaCardItem(
-                      rota: entrega,
-                      onTap: () {
-                        context.push('/rota_detalhe', extra: entrega);
-                      },
-                    );
-                  },
+              if (completedDeliveries.isNotEmpty) ...[
+                const SectionTitle(title: 'Entregas Concluídas'),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 240,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: completedDeliveries.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 12),
+                    itemBuilder: (context, index) {
+                      final delivery = completedDeliveries[index];
+                      return DeliveryCardItem(
+                        delivery: delivery,
+                        onTap: () {
+                          context.push('/rota_detalhe', extra: delivery);
+                        },
+                      );
+                    },
+                  ),
                 ),
-              ),
+              ],
+
+              if (_deliveries.isEmpty)
+                const Center(child: Text('Nenhuma entrega encontrada.')),
+            ],
           ],
         ),
       ),

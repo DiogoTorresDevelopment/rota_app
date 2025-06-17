@@ -1,4 +1,5 @@
 import 'package:rota_app/modules/routes/domain/models/rota_model.dart';
+import 'package:rota_app/modules/routes/domain/models/delivery_model.dart';
 
 abstract class RotaRepository {
   Future<List<RotaModel>> listarRotas({
@@ -10,4 +11,8 @@ abstract class RotaRepository {
   });
 
   Future<List<RotaModel>> listarEntregasRecentes({int limit = 5});
+
+  Future<List<DeliveryModel>> listarDeliveries();
+
+  Future<DeliveryModel> buscarDeliveryPorId(int id);
 }

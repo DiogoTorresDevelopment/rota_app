@@ -4,5 +4,6 @@ class AppEnvironment {
   static bool get isDev => !kReleaseMode;
 
 // alternativo manual:
-// static const bool isDev = true;
+static const bool isDev = false;
+static const bool isDev = false;
 }

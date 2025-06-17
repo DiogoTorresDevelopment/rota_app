@@ -31,19 +31,25 @@ class _SplashPageState extends State<SplashPage>
   }
 
   Future<void> _checkLoginStatus() async {
-    await Future.delayed(const Duration(seconds: 2)); // tempo da animação
-    final token = await TokenHelper.getToken();
+    debugPrint('[SPLASH] Iniciando verificação de login');
+    try {
+      await Future.delayed(const Duration(seconds: 2)); // tempo da animação
+      final token = await TokenHelper.getToken();
 
-    if (DevConfig.enableLogs) {
       debugPrint('[SPLASH] Token carregado: $token');
-    }
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    if (token != null) {
-      context.go('/home');
-    } else {
-      context.go('/login');
+      if (token != null) {
+        debugPrint('[SPLASH] Navegando para /home');
+        context.go('/home');
+      } else {
+        debugPrint('[SPLASH] Navegando para /login');
+        context.go('/login');
+      }
+    } catch (e, s) {
+      debugPrint('[SPLASH] Erro inesperado: $e');
+      debugPrint('$s');
     }
   }
 
